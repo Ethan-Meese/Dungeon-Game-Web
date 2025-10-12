@@ -1,0 +1,12 @@
+<div class="game">
+  <h2>Dungeon Game</h2>
+  <p><strong>Health:</strong> {{ health }}</p>
+  <p>{{ state }}</p>
+
+  <div class="actions">
+    <input [(ngModel)]="choice" placeholder="Enter your choice..." />
+    <button (click)="makeChoice()">Submit</button>
+  </div>
+
+  <button (click)="startGame()">Start New Game</button>
+</div>
