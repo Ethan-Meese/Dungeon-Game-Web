@@ -7,19 +7,19 @@ namespace backend.Controllers;
 [Route("api/[controller]")]
 public class GameController : ControllerBase
 {
-    private static GameEngine game = new GameEngine();
+    private static GameEngine _Engine = new();
 
     [HttpGet("start")]
     public IActionResult Start()
     {
-        game.Start();
-        return Ok(game.GetState());
+        _Engine.StartGame();
+        return Ok(_Engine.GetState());
     }
 
-    [HttpPost("choose")]
-    public IActionResult Choose([FromBody] string choice)
+    [HttpPost("action")]
+    public IActionResult Choose([FromBody] string action)
     {
-        game.MakeChoice(choice);
-        return Ok(game.GetState());
+        _Engine.ProcessAction(action);
+        return Ok(_Engine.GetState());
     }
 }
