@@ -9,17 +9,28 @@ public class GameController : ControllerBase
 {
     private static GameEngine _Engine = new();
 
-    [HttpGet("start")]
+    [HttpPost("start")]
     public IActionResult Start()
     {
-        _Engine.StartGame();
-        return Ok(_Engine.GetState());
+        var state = _Engine.StartGame();
+        return Ok(state);
     }
 
     [HttpPost("action")]
-    public IActionResult Choose([FromBody] string action)
+    public IActionResult Choose([FromBody] ActionRequest request)
     {
-        _Engine.ProcessAction(action);
+        var state = _Engine.ProcessAction(request.Action);
+        return Ok(state);
+    }
+
+    [HttpGet("state")]
+    public IActionResult GetState()
+    {
         return Ok(_Engine.GetState());
     }
+}
+
+public class ActionRequest
+{
+    public string Action { get; set; } = string.Empty;
 }

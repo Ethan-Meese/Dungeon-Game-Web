@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { GameService } from '../../services/game.service';
+import { Component, OnInit } from '@angular/core';
+import { GameService, type GameState } from '../../services/game.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -11,26 +11,45 @@ import { CommonModule } from '@angular/common';
   styleUrl: './game.component.css',
   standalone: true
 })
-export class GameComponent {
-  state: string  = '';
-  health: number = 100;
-  choice: string = '';
+export class GameComponent implements OnInit{
+state?: GameState;
+loading = false;
+errorMessage = '';
 
   constructor(private gameService: GameService) {}
 
-  startGame() {
-    this.gameService.startGame().subscribe((data) => {
-      this.state = data.state;
-      this.health = data.health;
+  ngOnInit(): void {
+    this.startGame();
+  }
+
+  startGame(): void{
+    this.loading = true;
+    this.gameService.startGame().subscribe({
+      next: (data) => {
+        this.state = data;
+        this.loading = false;
+      },
+      error: (err) => {
+        this.errorMessage = 'Failed to start game.';
+        this.loading = false;
+        console.error(err);
+      }
     });
   }
 
-  makeChoice() {
-    this.gameService.sendChoice(this.choice).subscribe((data) => {
-      this.state = data.state;
-      this.health = data.health;
-      this.choice = '';
+  chooseAction(action: string) {
+    this.loading = true;
+    this.gameService.sendAction(action).subscribe({
+      next: (data) => {
+        this.state = data;
+        this.loading = false;
+      },
+      error: (err) => {
+        this.errorMessage = 'Action failed.';
+        this.loading = false;
+      }
     });
   }
+
   
 }

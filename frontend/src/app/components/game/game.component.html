@@ -1,12 +1,52 @@
-<div class="game">
-  <h2>Dungeon Game</h2>
-  <p><strong>Health:</strong> {{ health }}</p>
-  <p>{{ state }}</p>
+@if (state) {
+  <div class="game-container">
+    <h2>{{ state.currentRoom.name }}</h2>
+    <p class="description">{{ state.currentRoom.description }}</p>
 
-  <div class="actions">
-    <input [(ngModel)]="choice" placeholder="Enter your choice..." />
-    <button (click)="makeChoice()">Submit</button>
+    <p class="message"><strong>{{ state.message }}</strong></p>
+
+    @if (state.currentRoom.enemies.length > 0) {
+      <div class="enemies">
+        <h3>Enemies:</h3>
+        <ul>
+          @for (e of state.currentRoom.enemies; track e.name) {
+            <li>
+              {{ e.name }} - HP: {{ e.health }}
+            </li>
+          }
+        </ul>
+      </div>
+    }
+
+    <div class="player-stats">
+      <h3>Player</h3>
+      <p>HP: {{ state.player.health }}</p>
+      <p>Attack: {{ state.player.attackDamage }}</p>
+    </div>
+
+    <div class="actions">
+      @for (option of state.options; track option) {
+        <button
+          (click)="chooseAction(option)"
+          [disabled]="loading">
+          {{ option }}
+        </button>
+      }
+    </div>
+
+    @if (state.isGameOver) {
+      <div class="game-over">
+        <h2>💀 Game Over 💀</h2>
+        <button (click)="startGame()">Restart</button>
+      </div>
+    }
   </div>
+}
 
-  <button (click)="startGame()">Start New Game</button>
-</div>
+@if (loading) {
+  <div class="loading">Loading...</div>
+}
+
+@if (errorMessage) {
+  <div class="error">{{ errorMessage }}</div>
+}

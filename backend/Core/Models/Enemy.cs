@@ -1,10 +1,9 @@
 namespace backend.Core.Models;
 
-public class Enemy
+public class Enemy(string name, int health, int attackDamage)
 {
-    public string Name { get; set; } = "";
-    public int Health { get; set; } = 50;
-    public int AttackDamage { get; set; } = 5;
-    public int AbilityPower { get; set; } = 5;
+    public string Name { get; set; } = name;
+    public int Health { get; set; } = health;
+    public int AttackDamage { get; set; } = attackDamage;
     public bool IsAlive => Health > 0;
 }
