@@ -8,10 +8,11 @@ public class GameEngine
 
     /* 
     TODO
-    impliment XP system
+    impliment showing Level and stats - make a button to display message of player stats
     fix scaling
     organize some code - make functions to clean
-    
+    Make more attacks for the player
+    multiple messages. (make a list instead of just a single string)
     
     */
 
@@ -24,7 +25,7 @@ public class GameEngine
         _state = new GameState
         {
             Player = new Player(),
-            DungeonLevel = 1,
+            DungeonLevel = 0,
             CurrentRoom = new Room
             {
                 Name = "Dungeon Entrance",
@@ -93,7 +94,7 @@ public class GameEngine
             "The room is bathed in an otherworldly glow emanating from a mystical portal. Ancient runes adorn the walls, pulsating with an ethereal energy. Shadows dance and shift, creating illusions that play tricks on the mind. The air crackles with a sense of arcane power...",
         };
         string randomRoomDescription = roomDescriptions[random.Next(roomDescriptions.Length)];
-        
+
         _state.DungeonLevel += 1;
         int enemyCount = random.Next(0, 3 + _state.DungeonLevel);
 
@@ -163,7 +164,8 @@ public class GameEngine
 
         if (_state.Player.IsAlive && _state.CurrentRoom.Enemies.Count == 0)
         {
-            _state.Message = "The room is Cleared!";
+            _state.Player.AddXP(25 + _state.DungeonLevel * 2);
+            _state.Message = $"The room is Cleared! You gained {25 + _state.DungeonLevel * 2} XP";
             _state.Options = ["Continue Ahead", "Rest"];
             return;
         }
@@ -177,9 +179,17 @@ public class GameEngine
     }
     private void Rest()
     {
-        int healthHealed = random.Next(6, 30);
-        _state.Player.AddHealth(healthHealed);
-        _state.Message = $"You feel rejuvinated, you healed {healthHealed}";
+        if (_state.Player.Health != _state.Player.MaxHealth)
+        {
+            int healthHealed = random.Next(6, 30);
+            _state.Player.AddHealth(healthHealed);
+            _state.Message = $"You feel rejuvinated, you healed {(_state.Player.Health == _state.Player.MaxHealth ? "to max health" : healthHealed)}";
+        }
+        else
+        {
+            _state.Message = "You surprisingly feel well rested. Only you wish you had a cup of joe to feel more at home. -10 Mental Stability";
+        }
+
         _state.Options = ["Continue Ahead"];
     }
     
