@@ -4,8 +4,11 @@ import { Observable } from 'rxjs';
 
 export interface Player {
   name: string;
+  maxHealth: number;
   health: number;
   attackDamage: number;
+  maxMana: number;
+  mana: number;
   xP: number;
   level: number;
   isAlive: boolean;

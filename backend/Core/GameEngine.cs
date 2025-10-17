@@ -8,9 +8,10 @@ public class GameEngine
 
     /* 
     TODO
+    make attack option give 3 attack options and make message = the attack damages and their costs.
     impliment showing Level and stats - make a button to display message of player stats
     fix scaling
-    organize some code - make functions to clean
+    organize some code - make functions to clean up
     Make more attacks for the player
     multiple messages. (make a list instead of just a single string)
     
