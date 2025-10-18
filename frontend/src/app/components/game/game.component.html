@@ -20,8 +20,15 @@
 
     <div class="player-stats">
       <h3>Player</h3>
-      <p>HP: {{ state.player.health }}</p>
-      <p>Attack: {{ state.player.attackDamage }}</p>
+      <p>LVL: {{state.player.level}}</p>
+      <p>XP: {{state.player.xp}} / 100</p>
+      <p>HP: {{ state.player.health }} / {{state.player.maxHealth}}</p>
+      <p>Mana: {{ state.player.mana }} / {{state.player.maxMana}}</p>
+      <p>Light Attack: {{state.player.playerAttacks[0].attackDamage}} Cost: {{state.player.playerAttacks[0].attackManaCost}}</p>
+      <p>Medium Attack: {{state.player.playerAttacks[1].attackDamage}} Cost: {{state.player.playerAttacks[1].attackManaCost}}</p>
+      <p>Heavy Attack: {{state.player.playerAttacks[2].attackDamage}} Cost: {{state.player.playerAttacks[2].attackManaCost}}</p>
+      <p>Ultimate Attack: {{state.player.playerAttacks[3].attackDamage}} Cost: {{state.player.playerAttacks[3].attackManaCost}}</p>
+
     </div>
 
     <div class="actions">

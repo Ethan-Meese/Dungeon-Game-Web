@@ -7,11 +7,17 @@ export interface Player {
   maxHealth: number;
   health: number;
   attackDamage: number;
+  playerAttacks: Attacks[];
   maxMana: number;
   mana: number;
-  xP: number;
+  xp: number;
   level: number;
   isAlive: boolean;
+}
+export interface Attacks{
+  attackName: string;
+  attackDamage: number;
+  attackManaCost: number;
 }
 
 export interface Enemy {

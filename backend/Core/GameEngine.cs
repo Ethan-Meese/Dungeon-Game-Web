@@ -8,17 +8,15 @@ public class GameEngine
 
     /* 
     TODO
-    make attack option give 3 attack options and make message = the attack damages and their costs.
-    impliment showing Level and stats - make a button to display message of player stats
-    fix scaling
+    make a button to display message of player stats
     organize some code - make functions to clean up
-    Make more attacks for the player
     multiple messages. (make a list instead of just a single string)
     
     */
 
     private GameState _state = new();
     private Random random = new();
+    private int ultimateAttackCooldown = 0;
 
     // Starts the game with the inital setup
     public GameState StartGame()
@@ -50,14 +48,65 @@ public class GameEngine
                 ContinueAhead();
                 break;
             case "Attack":
-                Attack();
+                // once i get many messages set up, list each stat for attacks.
+                _state.Options = ["Light Attack", "Medium Attack", "Heavy Attack", "Ultimate Attack", "Back"];
+                break;
+            case "Light Attack":
+                if (_state.Player.Mana >= _state.Player.PlayerAttacks[0].AttackManaCost)
+                {
+                    LightAttack();
+                }
+                else
+                {
+                    _state.Message = "You do not have enough mana for this attack.";
+                }
+                break;
+            case "Medium Attack":
+                if (_state.Player.Mana >= _state.Player.PlayerAttacks[1].AttackManaCost)
+                {
+                    MediumAttack();
+                }
+                else
+                {
+                    _state.Message = "You do not have enough mana for this attack.";
+                }
+                break;
+            case "Heavy Attack":
+                if (_state.Player.Mana >= _state.Player.PlayerAttacks[2].AttackManaCost)
+                {
+                    HeavyAttack();
+                }
+                else
+                {
+                    _state.Message = "You do not have enough mana for this attack.";
+                }
+                break;
+            case "Ultimate Attack":
+                if (_state.Player.Mana >= _state.Player.PlayerAttacks[3].AttackManaCost && ultimateAttackCooldown == 0)
+                {
+                    UltimateAttack();
+                }
+                else if (_state.Player.Mana < _state.Player.PlayerAttacks[3].AttackManaCost)
+                {
+                    _state.Message = "You do not have enough mana for this attack.";
+                }
+                else
+                {
+                    _state.Message = $"Your ultimate is on cooldown for {ultimateAttackCooldown} more {(ultimateAttackCooldown == 1 ? "attack" : "attacks")}";
+                }
                 break;
             /*case "Run":
                 Run();
                 break;
             case "Look Around":
                 LookAround();
+                break;
+            case "Stats":
+                DisplayStats();
                 break; */
+            case "Back":
+                _state.Options = ["Attack", "Rest", "Run"];
+                break;
             case "Rest":
                 Rest();
                 break;
@@ -71,6 +120,156 @@ public class GameEngine
         // returns updated state to the front end after an action
         return _state;
 
+    }
+
+    private void UltimateAttack()
+    {
+        ultimateAttackCooldown = 7;
+        // do the attack stuff
+        int enemiesToHit = Math.Min(8, _state.CurrentRoom.Enemies.Count);
+        for (int i = 0; i < enemiesToHit; i++)
+        {
+            _state.CurrentRoom.Enemies[i].Health -= _state.Player.PlayerAttacks[3].AttackDamage;
+        }
+
+        _state.Player.Mana -= _state.Player.PlayerAttacks[3].AttackManaCost;
+        _state.CurrentRoom.Enemies.RemoveAll(e => e.Health <= 0);          
+
+        if(_state.CurrentRoom.Enemies.Count > 0)
+        {
+            _state.Player.Health -= _state.CurrentRoom.Enemies[0].AttackDamage;
+            _state.Message = $"You delt {_state.Player.PlayerAttacks[3].AttackDamage}. \n You took {_state.CurrentRoom.Enemies[0].AttackDamage}";
+        }
+        else if (_state.Player.IsAlive && _state.CurrentRoom.Enemies.Count == 0)
+        {
+            _state.Player.AddXP(25 + _state.DungeonLevel * 2);
+            _state.Message = $"The room is Cleared! You gained {25 + _state.DungeonLevel * 2} XP";
+            _state.Options = ["Continue Ahead", "Rest"];
+            return;
+        }
+
+        if (_state.Player.IsAlive == false)
+        {
+            _state.Message = "Game Over you died.";
+            _state.IsGameOver = true;
+            _state.Options = ["Restart"];
+        }
+        _state.Options = ["Attack", "Rest", "Run"];     
+    }
+
+    private void HeavyAttack()
+    {
+        if (ultimateAttackCooldown > 0)
+        {
+            ultimateAttackCooldown--;
+        }
+        // do the attack stuff
+        int enemiesToHit = Math.Min(5, _state.CurrentRoom.Enemies.Count);
+        for (int i = 0; i < enemiesToHit; i++)
+        {
+            _state.CurrentRoom.Enemies[i].Health -= _state.Player.PlayerAttacks[2].AttackDamage;
+        }
+
+        _state.Player.Mana -= _state.Player.PlayerAttacks[2].AttackManaCost;
+        _state.CurrentRoom.Enemies.RemoveAll(e => e.Health <= 0);
+
+        if(_state.CurrentRoom.Enemies.Count > 0)
+        {
+            _state.Player.Health -= _state.CurrentRoom.Enemies[0].AttackDamage;
+            _state.Message = $"You delt {_state.Player.PlayerAttacks[2].AttackDamage}. \n You took {_state.CurrentRoom.Enemies[0].AttackDamage}";
+        }
+        else if (_state.Player.IsAlive && _state.CurrentRoom.Enemies.Count == 0)
+        {
+            _state.Player.AddXP(25 + _state.DungeonLevel * 2);
+            _state.Message = $"The room is Cleared! You gained {25 + _state.DungeonLevel * 2} XP";
+            _state.Options = ["Continue Ahead", "Rest"];
+            return;
+        }
+
+        if (_state.Player.IsAlive == false)
+        {
+            _state.Message = "Game Over you died.";
+            _state.IsGameOver = true;
+            _state.Options = ["Restart"];
+        }
+
+        _state.Options = ["Attack", "Rest", "Run"]; 
+    }
+
+    private void MediumAttack()
+    {
+        if (ultimateAttackCooldown > 0)
+        {
+            ultimateAttackCooldown--;
+        }
+        // do the attack stuff
+        int enemiesToHit = Math.Min(4, _state.CurrentRoom.Enemies.Count);
+        for (int i = 0; i < enemiesToHit; i++)
+        {
+            _state.CurrentRoom.Enemies[i].Health -= _state.Player.PlayerAttacks[1].AttackDamage;
+        }
+
+        _state.Player.Mana -= _state.Player.PlayerAttacks[1].AttackManaCost;
+        _state.CurrentRoom.Enemies.RemoveAll(e => e.Health <= 0);   
+        
+        if(_state.CurrentRoom.Enemies.Count > 0)
+        {
+            _state.Player.Health -= _state.CurrentRoom.Enemies[0].AttackDamage;
+            _state.Message = $"You delt {_state.Player.PlayerAttacks[1].AttackDamage}. \n You took {_state.CurrentRoom.Enemies[0].AttackDamage}";
+        }
+        else if (_state.Player.IsAlive && _state.CurrentRoom.Enemies.Count == 0)
+        {
+            _state.Player.AddXP(25 + _state.DungeonLevel * 2);
+            _state.Message = $"The room is Cleared! You gained {25 + _state.DungeonLevel * 2} XP";
+            _state.Options = ["Continue Ahead", "Rest"];
+            return;
+        }
+
+        if (_state.Player.IsAlive == false)
+        {
+            _state.Message = "Game Over you died.";
+            _state.IsGameOver = true;
+            _state.Options = ["Restart"];
+        }
+        _state.Options = ["Attack", "Rest", "Run"];  
+    }
+
+    private void LightAttack()
+    {
+        if (ultimateAttackCooldown > 0)
+        {
+            ultimateAttackCooldown--;
+        }
+        // do the attack stuff
+        int enemiesToHit = Math.Min(3, _state.CurrentRoom.Enemies.Count);
+        for (int i = 0; i < enemiesToHit; i++)
+        {
+            _state.CurrentRoom.Enemies[i].Health -= _state.Player.PlayerAttacks[0].AttackDamage;
+        }
+
+        _state.Player.Mana -= _state.Player.PlayerAttacks[0].AttackManaCost;
+        _state.CurrentRoom.Enemies.RemoveAll(e => e.Health <= 0);
+        
+        if(_state.CurrentRoom.Enemies.Count > 0)
+        {
+            _state.Player.Health -= _state.CurrentRoom.Enemies[0].AttackDamage;
+            _state.Message = $"You delt {_state.Player.PlayerAttacks[0].AttackDamage}. \n You took {_state.CurrentRoom.Enemies[0].AttackDamage}";
+        }
+        else if (_state.Player.IsAlive && _state.CurrentRoom.Enemies.Count == 0)
+        {
+            _state.Player.AddXP(25 + _state.DungeonLevel * 2);
+            _state.Message = $"The room is Cleared! You gained {25 + _state.DungeonLevel * 2} XP";
+            _state.Options = ["Continue Ahead", "Rest"];
+            return;
+        }
+
+        if (_state.Player.IsAlive == false)
+        {
+            _state.Message = "Game Over you died.";
+            _state.IsGameOver = true;
+            _state.Options = ["Restart"];
+        }
+        _state.Options = ["Attack", "Rest", "Run"];     
     }
 
     private void GenerateRoom()
@@ -114,7 +313,7 @@ public class GameEngine
         if (_state.CurrentRoom.Enemies.Count > 0)
         {
             _state.Message = $"You encounter {enemyCount} {(enemyCount > 1 ? "enemies" : "enemy")}!";
-            _state.Options = ["Attack", "Run"];
+            _state.Options = ["Attack", "Rest", "Run"];
         }
         else
         {
@@ -136,62 +335,30 @@ public class GameEngine
         GenerateRoom();
     }
 
-    public void Attack()
-    {
-        // do the attack stuff
-        if (_state.Player.IsAlive && _state.CurrentRoom.Enemies.Count > 2)
-        {
-            for (int i = 0; i < 3; i++)
-            {
-                _state.CurrentRoom.Enemies[i].Health -= _state.Player.AttackDamage;
-            }
-        }
-        else if (_state.CurrentRoom.Enemies.Count == 2)
-        {
-            for (int i = 0; i < 2; i++)
-            {
-                _state.CurrentRoom.Enemies[i].Health -= _state.Player.AttackDamage;
-            }
-        }
-        else if (_state.CurrentRoom.Enemies.Count == 1)
-        {
-            _state.CurrentRoom.Enemies[0].Health -= _state.Player.AttackDamage;
-        }
-
-        _state.Message = $"You delt {_state.Player.AttackDamage}. \n You took {_state.CurrentRoom.Enemies[0].AttackDamage}";    
-        _state.Player.Health -= _state.CurrentRoom.Enemies[0].AttackDamage;
-        _state.CurrentRoom.Enemies.RemoveAll(e => e.Health <= 0);
-
-
-        if (_state.Player.IsAlive && _state.CurrentRoom.Enemies.Count == 0)
-        {
-            _state.Player.AddXP(25 + _state.DungeonLevel * 2);
-            _state.Message = $"The room is Cleared! You gained {25 + _state.DungeonLevel * 2} XP";
-            _state.Options = ["Continue Ahead", "Rest"];
-            return;
-        }
-        
-        if (_state.Player.IsAlive == false)
-        {
-            _state.Message = "Game Over you died.";
-            _state.IsGameOver = true;
-            _state.Options = ["Restart"];
-        }
-    }
     private void Rest()
     {
-        if (_state.Player.Health != _state.Player.MaxHealth)
+        if (_state.Player.Health != _state.Player.MaxHealth || _state.Player.Mana != _state.Player.MaxMana)
         {
             int healthHealed = random.Next(6, 30);
+            int manaRegened = random.Next(15,50);
             _state.Player.AddHealth(healthHealed);
-            _state.Message = $"You feel rejuvinated, you healed {(_state.Player.Health == _state.Player.MaxHealth ? "to max health" : healthHealed)}";
+            _state.Player.AddMana(manaRegened);
+            _state.Message = $"You feel rejuvinated, you healed {(_state.Player.Health == _state.Player.MaxHealth ? "to max health" : healthHealed)}. Your regained {(_state.Player.Mana == _state.Player.MaxMana ? "max mana" : manaRegened) + "mana"}";
         }
         else
         {
             _state.Message = "You surprisingly feel well rested. Only you wish you had a cup of joe to feel more at home. -10 Mental Stability";
         }
 
-        _state.Options = ["Continue Ahead"];
+        if (_state.CurrentRoom.Enemies.Count == 0)
+        {
+            _state.Options = ["Continue Ahead"];
+        }
+        else
+        {
+            _state.Options = ["Attack", "Run"];
+            _state.Player.Health -= _state.CurrentRoom.Enemies[0].AttackDamage;
+        }
     }
     
     /* Maybe add later

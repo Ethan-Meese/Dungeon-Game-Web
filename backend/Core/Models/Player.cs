@@ -12,8 +12,25 @@ public class Player
     public int MaxMana { get; set; } = 100;
     public int Gold { get; set; } = 0;
     public List<string> Inventory { get; set; } = [];
+    public List<Attacks> PlayerAttacks { get; set; } = [];
     public bool IsAlive => Health > 0;
 
+    public Player()
+    {
+        PlayerAttacks.Add(new Attacks("Light Attack", AttackDamage, (int)(MaxMana / 12)));
+        PlayerAttacks.Add(new Attacks("Medium Attack", (int)(AttackDamage * 2), (int)(MaxMana / 8)));
+        PlayerAttacks.Add(new Attacks("Heavy Attack", (int)(AttackDamage * 3), (int)(MaxMana / 5)));
+        PlayerAttacks.Add(new Attacks("Ultimate Attack", (int)(AttackDamage * 5.5), (int)(MaxMana / 3)));
+    }
+
+    private void UpdateAttacks()
+    {
+        PlayerAttacks.Clear();
+        PlayerAttacks.Add(new Attacks("Light Attack", AttackDamage, (int)(MaxMana / 12)));
+        PlayerAttacks.Add(new Attacks("Medium Attack", (int)(AttackDamage * 2), (int)(MaxMana / 8)));
+        PlayerAttacks.Add(new Attacks("Heavy Attack", (int)(AttackDamage * 3), (int)(MaxMana / 5)));
+        PlayerAttacks.Add(new Attacks("Ultimate Attack", (int)(AttackDamage * 5.5), (int)(MaxMana / 3)));
+    }
 
     public void AddHealth(int amount)
     {
@@ -46,6 +63,7 @@ public class Player
             AttackDamage += 3;
             MaxMana += 5;
             Mana += 5;
+            UpdateAttacks(); //updates players attack stats
 
         }
     }
